@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JobConnect – Find Your Dream Job</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<!-- ==================== NAVBAR ==================== -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <div class="logo" onclick="showPage('home')">
+      <i class="fa-solid fa-briefcase"></i>
+      <span>JobConnect</span>
+    </div>
+
+    <div class="nav-links">
+      <a onclick="showPage('home')">Home</a>
+      <a onclick="showPage('jobs')">Find Jobs</a>
+      <a onclick="showPage('companies')">Companies</a>
+      <a onclick="showPage('saved')">Saved</a>
+      <span class="nav-user" id="navUser"></span>
+      <button class="btn btn-primary btn-sm" id="loginBtn" onclick="openAuth()">Login / Register</button>
+      <button class="btn btn-sm" id="dashBtn" onclick="goToDashboard()" style="display:none;">Dashboard</button>
+      <button class="btn btn-sm" id="logoutBtn" onclick="logout()" style="display:none; color:#dc2626;">Logout</button>
+    </div>
+
+    <button class="hamburger" onclick="toggleMobile()">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </div>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a onclick="showPage('home'); toggleMobile()">Home</a>
+    <a onclick="showPage('jobs'); toggleMobile()">Find Jobs</a>
+    <a onclick="showPage('companies'); toggleMobile()">Companies</a>
+    <a onclick="showPage('saved'); toggleMobile()">Saved Jobs</a>
+    <a id="mobDash" onclick="goToDashboard(); toggleMobile()" style="display:none;">Dashboard</a>
+    <button class="btn btn-primary btn-full" onclick="openAuth(); toggleMobile()">Login / Register</button>
+    <button class="btn btn-full" id="mobLogout" onclick="logout(); toggleMobile()" style="display:none; color:#dc2626;">Logout</button>
+  </div>
+</nav>
+
+<!-- ==================== HOME PAGE ==================== -->
+<section id="page-home" class="page">
+  <div class="hero">
+    <h1>Find Your Dream Job</h1>
+    <p>Discover thousands of opportunities and take the next step in your career.</p>
+
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Job title or keyword">
+      <input type="text" id="locationInput" placeholder="Location">
+      <select id="categoryInput">
+        <option value="">All Categories</option>
+        <option>Software Development</option>
+        <option>Web Development</option>
+        <option>Data Science</option>
+        <option>Design</option>
+        <option>Cloud</option>
+      </select>
+      <button class="btn btn-primary" onclick="searchFromHome()">
+        <i class="fa-solid fa-search"></i> Search
+      </button>
+    </div>
+
+    <div class="popular-tags">
+      <span>Popular:</span>
+      <button class="tag-btn" onclick="quickSearch('Developer')">Software Developer</button>
+      <button class="tag-btn" onclick="quickSearch('Frontend')">Web Developer</button>
+      <button class="tag-btn" onclick="quickSearch('Data')">Data Analyst</button>
+      <button class="tag-btn" onclick="quickSearch('Designer')">UI/UX Designer</button>
+      <button class="tag-btn" onclick="quickSearch('Java')">Java Developer</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="num">10,000+</div>
+      <div class="lbl">Jobs</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">5,000+</div>
+      <div class="lbl">Companies</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">25,000+</div>
+      <div class="lbl">Candidates</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">1,500+</div>
+      <div class="lbl">Jobs Filled</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">Featured Jobs</h2>
+    <div class="grid-3" id="featuredJobs"></div>
+  </div>
+</section>
+
+<!-- ==================== FIND JOBS PAGE ==================== -->
+<section id="page-jobs" class="page hidden">
+  <div class="section">
+    <h2 class="section-title">Find Jobs</h2>
+
+    <div class="jobs-layout">
+      <!-- Filters -->
+      <aside class="filters">
+        <h3>Filters</h3>
+
+        <div class="filter-group">
+          <label>Search</label>
+          <input type="text" id="jobSearch" placeholder="Search jobs..." oninput="renderJobs()">
+        </div>
+
+        <div class="filter-group">
+          <label>Job Type</label>
+          <select id="filterType" onchange="renderJobs()">
+            <option value="">All Types</option>
+            <option>Full Time</option>
+            <option>Part Time</option>
+            <option>Internship</option>
+            <option>Contract</option>
+            <option>Remote</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Location</label>
+          <input type="text" id="filterLocation" placeholder="e.g. Chennai" oninput="renderJobs()">
+        </div>
+
+        <div class="filter-group">
+          <label>Sort By</label>
+          <select id="sortBy" onchange="renderJobs()">
+            <option value="">Default</option>
+            <option value="title">Title (A–Z)</option>
+            <option value="company">Company (A–Z)</option>
+          </select>
+        </div>
+
+        <button class="btn btn-outline btn-full btn-sm" onclick="clearFilters()">Clear Filters</button>
+      </aside>
+
+      <!-- Job List -->
+      <div id="jobList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== COMPANIES PAGE ==================== -->
+<section id="page-companies" class="page hidden">
+  <div class="section">
+    <h2 class="section-title">Top Companies</h2>
+    <div class="grid-3" id="companyList"></div>
+  </div>
+</section>
+
+<!-- ==================== SAVED JOBS PAGE ==================== -->
+<section id="page-saved" class="page hidden">
+  <div class="section">
+    <h2 class="section-title">My Saved Jobs</h2>
+    <div id="savedList"></div>
+  </div>
+</section>
+
+<!-- ==================== JOB SEEKER DASHBOARD ==================== -->
+<section id="page-seeker-dashboard" class="page hidden">
+  <div class="dashboard">
+    <aside class="sidebar">
+      <a class="active" onclick="showSeekerTab('overview')"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+      <a onclick="showSeekerTab('applied')"><i class="fa-solid fa-file-lines"></i> Applied Jobs</a>
+      <a onclick="showSeekerTab('saved')"><i class="fa-solid fa-bookmark"></i> Saved Jobs</a>
+      <a onclick="showSeekerTab('profile')"><i class="fa-solid fa-user"></i> My Profile</a>
+      <a onclick="showPage('notifications')"><i class="fa-solid fa-bell"></i> Notifications</a>
+      <a onclick="logout()" style="color:#dc2626;"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
+    </aside>
+
+    <div class="dashboard-main" id="seekerMain"></div>
+  </div>
+</section>
+
+<!-- ==================== RECRUITER DASHBOARD ==================== -->
+<section id="page-recruiter-dashboard" class="page hidden">
+  <div class="dashboard">
+    <aside class="sidebar">
+      <a class="active" onclick="showRecruiterTab('overview')"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+      <a onclick="showRecruiterTab('post')"><i class="fa-solid fa-plus"></i> Post Job</a>
+      <a onclick="showRecruiterTab('manage')"><i class="fa-solid fa-list"></i> Manage Jobs</a>
+      <a onclick="showRecruiterTab('applicants')"><i class="fa-solid fa-users"></i> Applicants</a>
+      <a onclick="showPage('notifications')"><i class="fa-solid fa-bell"></i> Notifications</a>
+      <a onclick="logout()" style="color:#dc2626;"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
+    </aside>
+
+    <div class="dashboard-main" id="recruiterMain"></div>
+  </div>
+</section>
+
+<!-- ==================== NOTIFICATIONS PAGE ==================== -->
+<section id="page-notifications" class="page hidden">
+  <div class="section">
+    <h2 class="section-title">Notifications</h2>
+    <div id="notifList"></div>
+  </div>
+</section>
+
+<!-- ==================== ABOUT PAGE ==================== -->
+<section id="page-about" class="page hidden">
+  <div class="section">
+    <h2 class="section-title">About JobConnect</h2>
+    <div class="job-card">
+      <p style="font-size:15px; color:#64748b; line-height:1.8;">
+        JobConnect is a modern job portal connecting talented job seekers with top companies.
+        Our mission is to make job hunting simple, fast, and effective for everyone.
+        Whether you are a fresher looking for your first opportunity or an experienced
+        professional seeking a career change, JobConnect helps you find the right fit.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== MODAL: JOB DETAILS ==================== -->
+<div class="modal hidden" id="jobModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('jobModal')">&times;</button>
+    <div id="jobDetailContent"></div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: APPLY ==================== -->
+<div class="modal hidden" id="applyModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('applyModal')">&times;</button>
+    <h2 style="margin-bottom:16px;">Apply for Job</h2>
+    <form id="applyForm" onsubmit="submitApplication(event)">
+      <div class="form-group">
+        <label>Full Name *</label>
+        <input type="text" id="appName" required>
+      </div>
+      <div class="form-group">
+        <label>Email *</label>
+        <input type="email" id="appEmail" required>
+      </div>
+      <div class="form-group">
+        <label>Phone *</label>
+        <input type="text" id="appPhone" required>
+      </div>
+      <div class="form-group">
+        <label>Resume (link or file name)</label>
+        <input type="text" id="appResume" placeholder="e.g. my_resume.pdf">
+      </div>
+      <div class="form-group">
+        <label>Portfolio URL</label>
+        <input type="url" id="appPortfolio" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label>LinkedIn URL</label>
+        <input type="url" id="appLinkedin" placeholder="https://linkedin.com/in/...">
+      </div>
+      <div class="form-group">
+        <label>Cover Letter</label>
+        <textarea id="appCover" rows="3"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Submit Application</button>
+    </form>
+  </div>
+</div>
+
+<!-- ==================== MODAL: AUTH ==================== -->
+<div class="modal hidden" id="authModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('authModal')">&times;</button>
+
+    <div class="flex gap-1 mb-2">
+      <button class="btn btn-primary btn-full" id="tabLogin" onclick="switchAuth('login')">Login</button>
+      <button class="btn btn-outline btn-full" id="tabRegister" onclick="switchAuth('register')">Register</button>
+    </div>
+
+    <!-- Login Form -->
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Login</button>
+      <p style="font-size:12px; color:#64748b; text-align:center; margin-top:10px;">
+        Demo: demo@job.com / 1234
+      </p>
+    </form>
+
+    <!-- Register Form -->
+    <form id="registerForm" onsubmit="handleRegister(event)" class="hidden">
+      <div class="form-group">
+        <label>I am a</label>
+        <select id="regRole">
+          <option value="jobseeker">Job Seeker</option>
+          <option value="recruiter">Recruiter</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="regName" required>
+      </div>
+      <div class="form-group" id="companyGroup" style="display:none;">
+        <label>Company Name</label>
+        <input type="text" id="regCompany">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="regEmail" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="regPass" required minlength="4">
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+    </form>
+  </div>
+</div>
+
+<!-- ==================== MODAL: EDIT JOB ==================== -->
+<div class="modal hidden" id="editJobModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('editJobModal')">&times;</button>
+    <h2 style="margin-bottom:16px;">Edit Job</h2>
+    <form id="editJobForm" onsubmit="saveEditedJob(event)">
+      <input type="hidden" id="editJobId">
+      <div class="form-group">
+        <label>Job Title</label>
+        <input type="text" id="editTitle" required>
+      </div>
+      <div class="form-group">
+        <label>Company</label>
+        <input type="text" id="editCompany" required>
+      </div>
+      <div class="form-group">
+        <label>Location</label>
+        <input type="text" id="editLocation" required>
+      </div>
+      <div class="form-group">
+        <label>Salary</label>
+        <input type="text" id="editSalary" required>
+      </div>
+      <div class="form-group">
+        <label>Job Type</label>
+        <select id="editType">
+          <option>Full Time</option>
+          <option>Part Time</option>
+          <option>Internship</option>
+          <option>Contract</option>
+          <option>Remote</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Experience</label>
+        <input type="text" id="editExp" required>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="editDesc" rows="3" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Save Changes</button>
+    </form>
+  </div>
+</div>
+
+<!-- ==================== TOAST ==================== -->
+<div id="toast" class="hidden"></div>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div>
+      <div class="logo" style="color:white; margin-bottom:10px;">
+        <i class="fa-solid fa-briefcase"></i>
+        <span>JobConnect</span>
+      </div>
+      <p style="color:#94a3b8; font-size:13px;">Connecting talent with opportunity.</p>
+    </div>
+
+    <div>
+      <h4>Quick Links</h4>
+      <ul>
+        <li onclick="showPage('home')">Home</li>
+        <li onclick="showPage('jobs')">Find Jobs</li>
+        <li onclick="showPage('companies')">Companies</li>
+        <li onclick="showPage('about')">About Us</li>
+      </ul>
+    </div>
+
+    <div>
+      <h4>For Employers</h4>
+      <ul>
+        <li onclick="goToDashboard()">Post a Job</li>
+        <li onclick="openAuth()">Recruiter Login</li>
+        <li onclick="goToDashboard()">Employer Dashboard</li>
+      </ul>
+    </div>
+
+    <div>
+      <h4>Follow Us</h4>
+      <div class="socials">
+        <i class="fa-brands fa-facebook"></i>
+        <i class="fa-brands fa-twitter"></i>
+        <i class="fa-brands fa-linkedin"></i>
+        <i class="fa-brands fa-instagram"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    © 2026 JobConnect. All Rights Reserved.
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
